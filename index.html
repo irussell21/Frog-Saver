@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FROG HABITAT — Build Your Backyard Refuge</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@300;400;500&display=swap');
+:root{--bg:#191d1a;--card:#202520;--card2:#252c25;--text:#c4d0bf;--muted:#6e8868;--dim:#404e3e;--a1:#c8e86a;--a2:#6dd68a;--a3:#5bc8c8;--a4:#e8a84a;--a5:#a87de8;--border:#2a342a;--mono:'DM Mono',monospace;--display:'Barlow Condensed',sans-serif;--body:'Barlow',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");}
+header{padding:1.8rem 3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;}
+.site-id{font-family:var(--mono);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);}
+.site-id em{color:var(--a2);font-style:normal;}
+.header-credit{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
+.header-credit a{color:var(--a2);text-decoration:none;}
+.hero{padding:4.5rem 3rem 3.5rem;max-width:920px;}
+.hero-eyebrow{font-family:var(--mono);font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--a2);margin-bottom:1.1rem;}
+.hero h1{font-family:var(--display);font-size:clamp(3.8rem,9vw,7.5rem);font-weight:900;line-height:.9;text-transform:uppercase;color:var(--a1);margin-bottom:1.6rem;}
+.hero h1 .ghost{color:var(--muted);}
+.hero-body{font-size:1.1rem;font-weight:300;line-height:1.75;color:var(--text);max-width:580px;}
+.divider{margin:0 3rem;height:1px;background:var(--border);}
+#form-section{padding:3rem 3rem 5rem;}
+.form-card{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--a2);max-width:820px;padding:2.5rem 3rem;}
+.form-eyebrow{font-family:var(--mono);font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);padding-bottom:.9rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.fields{display:flex;flex-direction:column;gap:1.6rem;}
+.field-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.55rem;}
+.field-hint{font-size:.8rem;color:var(--dim);margin-bottom:.55rem;font-style:italic;}
+input[type=text],textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--body);font-size:.95rem;padding:.75rem 1rem;outline:none;transition:border-color .2s;-webkit-appearance:none;border-radius:0;}
+input[type=text]:focus,textarea:focus{border-color:var(--a2);}
+textarea{resize:vertical;min-height:80px;line-height:1.5;}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.55rem .75rem;margin-top:.2rem;}
+.check-item{display:flex;align-items:center;gap:.55rem;cursor:pointer;padding:.35rem .5rem;border:1px solid transparent;transition:border-color .15s,background .15s;}
+.check-item:hover{border-color:var(--border);background:var(--card2);}
+.check-item input[type=checkbox]{appearance:none;width:13px;height:13px;border:1px solid var(--dim);background:var(--bg);flex-shrink:0;cursor:pointer;position:relative;transition:background .15s,border-color .15s;}
+.check-item input[type=checkbox]:checked{background:var(--a2);border-color:var(--a2);}
+.check-item input[type=checkbox]:checked::after{content:'✓';position:absolute;top:-2px;left:1px;font-size:9px;color:var(--bg);font-weight:700;}
+.check-item span{font-size:.88rem;color:var(--text);user-select:none;}
+.upload-zone{border:1px dashed var(--border);background:var(--bg);padding:1.75rem;text-align:center;cursor:pointer;position:relative;transition:border-color .2s,background .2s;}
+.upload-zone:hover{border-color:var(--a2);background:#1c221c;}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:1.6rem;opacity:.4;margin-bottom:.4rem;}
+.upload-lbl{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.upload-sub{font-size:.72rem;color:var(--dim);margin-top:.25rem;}
+#preview-img{display:none;width:100%;max-height:180px;object-fit:cover;margin-top:1rem;}
+.submit-row{display:flex;align-items:center;gap:1.5rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;}
+.btn-go{background:var(--a2);color:var(--bg);border:none;font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;padding:1rem 2.5rem;cursor:pointer;font-weight:500;transition:background .2s,transform .1s;flex-shrink:0;}
+.btn-go:hover{background:var(--a1);}
+.btn-go:active{transform:scale(.98);}
+.btn-go:disabled{opacity:.4;cursor:not-allowed;}
+.submit-note{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);line-height:1.6;}
+#loading{display:none;padding:0 3rem 4rem;max-width:820px;}
+.loading-card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--a3);padding:2rem 2.5rem;}
+.loading-lbl{font-family:var(--mono);font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--a3);margin-bottom:1rem;}
+.bar-track{height:2px;background:var(--border);overflow:hidden;margin-bottom:1.2rem;}
+.bar-fill{height:100%;background:var(--a3);animation:barMove 2.5s ease-in-out infinite;}
+@keyframes barMove{0%{width:0%;opacity:1;}60%{width:75%;opacity:.9;}100%{width:92%;opacity:.6;}}
+.loading-steps{display:flex;flex-direction:column;gap:.55rem;}
+.lstep{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:.7rem;transition:color .4s;}
+.lstep.active{color:var(--muted);}
+.lstep.done{color:var(--a2);}
+.ldot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+#report-section{display:none;padding:0 3rem 7rem;max-width:820px;}
+.report-flag{font-family:var(--mono);font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.report-h1{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;text-transform:uppercase;color:var(--a1);line-height:.92;margin-bottom:.6rem;}
+.report-addr{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:2.5rem;}
+.conn-strip{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--a4);padding:1.4rem 1.8rem;margin-bottom:2rem;display:none;}
+.conn-lbl{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--a4);margin-bottom:.6rem;}
+.conn-score-row{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.5rem;}
+.conn-num{font-family:var(--display);font-size:2.8rem;font-weight:900;color:var(--a4);line-height:1;}
+.conn-sublabel{font-size:.88rem;color:var(--muted);}
+.conn-body{font-size:.9rem;line-height:1.65;color:var(--text);}
+#map-wrap{display:none;margin-bottom:2rem;border:1px solid var(--border);border-top:3px solid var(--a3);}
+.map-lbl{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--a3);padding:.8rem 1rem;border-bottom:1px solid var(--border);background:var(--card);}
+.map-sublbl{font-family:var(--mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:.4rem 1rem .6rem;background:var(--card);border-bottom:1px solid var(--border);}
+#map{height:380px;width:100%;}
+.map-legend{background:var(--card);border-top:1px solid var(--border);padding:.75rem 1rem;display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.inat-count{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--a5);margin-left:auto;}
+.rbody{font-size:.95rem;line-height:1.8;color:var(--text);}
+.rbody h2{font-family:var(--mono);font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);padding-bottom:.5rem;border-bottom:1px solid var(--border);margin:2.5rem 0 1.1rem;}
+.rbody h3{font-family:var(--display);font-size:1.25rem;font-weight:700;text-transform:uppercase;color:var(--a1);margin:1.4rem 0 .4rem;}
+.rbody p{margin-bottom:.9rem;}
+.rbody strong{color:#fff;font-weight:500;}
+.rbody em{color:var(--a2);font-style:normal;}
+.rbody ul{list-style:none;margin:.4rem 0 1rem;padding:0;}
+.rbody ul li{padding-left:1.4rem;position:relative;margin-bottom:.35rem;font-size:.92rem;}
+.rbody ul li::before{content:'—';position:absolute;left:0;color:var(--a2);}
+.step-cards{display:flex;flex-direction:column;gap:2px;margin:1rem 0 1.5rem;}
+.scard{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--dim);padding:1.3rem 1.6rem 1.3rem 1.1rem;display:flex;gap:1.1rem;align-items:flex-start;transition:background .2s;}
+.scard:hover{background:var(--card2);}
+.scard:nth-child(1){border-left-color:var(--a4);}
+.scard:nth-child(2){border-left-color:var(--a2);}
+.scard:nth-child(3){border-left-color:var(--a3);}
+.scard:nth-child(4){border-left-color:var(--a1);}
+.scard:nth-child(5){border-left-color:var(--a5);}
+.snum{font-family:var(--display);font-size:1.9rem;font-weight:900;line-height:1;flex-shrink:0;width:1.8rem;}
+.scard:nth-child(1) .snum{color:var(--a4);}
+.scard:nth-child(2) .snum{color:var(--a2);}
+.scard:nth-child(3) .snum{color:var(--a3);}
+.scard:nth-child(4) .snum{color:var(--a1);}
+.scard:nth-child(5) .snum{color:var(--a5);}
+.scontent h4{font-family:var(--display);font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;}
+.scard:nth-child(1) .scontent h4{color:var(--a4);}
+.scard:nth-child(2) .scontent h4{color:var(--a2);}
+.scard:nth-child(3) .scontent h4{color:var(--a3);}
+.scard:nth-child(4) .scontent h4{color:var(--a1);}
+.scard:nth-child(5) .scontent h4{color:var(--a5);}
+.scontent p{font-size:.88rem;line-height:1.6;color:var(--text);margin:0;}
+.scontent p strong{color:#fff;}
+.species-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.6rem 0 1rem;}
+.chip{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.35rem .75rem;border:1px solid var(--border);color:var(--muted);}
+.chip.hero{border-color:var(--a2);color:var(--a2);}
+.btn-reset{margin-top:3rem;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;padding:.7rem 1.5rem;cursor:pointer;transition:border-color .2s,color .2s;}
+.btn-reset:hover{border-color:var(--muted);color:var(--text);}
+.err-card{background:var(--card);border:1px solid #3a2020;border-left:3px solid #e87070;padding:1.4rem 1.8rem;margin-bottom:1.5rem;}
+.err-lbl{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#e87070;margin-bottom:.4rem;}
+.err-body{font-size:.88rem;color:var(--text);line-height:1.6;}
+footer{border-top:1px solid var(--border);padding:1.5rem 3rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;}
+footer p{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
+footer a{color:var(--a2);text-decoration:none;}
+.leaflet-container{background:#1a1f1a !important;}
+.leaflet-tile{filter:brightness(.75) saturate(.6) hue-rotate(80deg);}
+.leaflet-popup-content-wrapper{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:0;box-shadow:none;font-family:var(--body);font-size:.85rem;}
+.leaflet-popup-tip{background:var(--card);}
+.leaflet-popup-content{margin:.75rem 1rem;}
+.leaflet-bar a{background:var(--card) !important;color:var(--text) !important;border-color:var(--border) !important;}
+@media(max-width:640px){header,footer,.hero,#form-section,#loading,#report-section{padding-left:1.25rem;padding-right:1.25rem;}.form-card{padding:1.5rem;}.hero h1{font-size:3.2rem;}.checks{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-id">🐸 &nbsp;<em>FROG HABITAT</em> — Backyard Refuge Generator</div>
+  <div class="header-credit">A free conservation tool / <a href="https://www.tiktok.com/@zekedarwinscience">@zekedarwinscience</a></div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Gray Tree Frog Recovery Initiative — North America</div>
+  <h1>YOUR YARD<br><span class="ghost">COULD</span><br>SAVE FROGS</h1>
+  <p class="hero-body">Amphibian populations are collapsing worldwide — but every backyard that makes small changes becomes a stepping stone. A node in a network that reconnects fragmented frog populations across the landscape. Enter your details below and get a free, personalized habitat report built for your exact yard.</p>
+</div>
+
+<div class="divider"></div>
+
+<div id="form-section">
+<div class="form-card">
+  <div class="form-eyebrow">Your Yard Details — Four Quick Questions</div>
+  <div class="fields">
+    <div>
+      <label class="field-label">1 &nbsp;/&nbsp; Your Address <span style="color:var(--a2)">*</span></label>
+      <input type="text" id="address" placeholder="e.g. 742 Evergreen Terrace, Springfield, IL 62701">
+    </div>
+    <div>
+      <label class="field-label">2 &nbsp;/&nbsp; What's in your yard? <span style="color:var(--dim)">(select all that apply)</span></label>
+      <div class="checks" id="features">
+        <label class="check-item"><input type="checkbox" value="mature trees"> <span>Mature trees</span></label>
+        <label class="check-item"><input type="checkbox" value="dense shrubs or hedges"> <span>Dense shrubs / hedges</span></label>
+        <label class="check-item"><input type="checkbox" value="lawn that holds puddles after heavy rain"> <span>Lawn holds puddles</span></label>
+        <label class="check-item"><input type="checkbox" value="a garden bed with plants"> <span>Garden bed / flowers</span></label>
+        <label class="check-item"><input type="checkbox" value="an existing pond or water feature"> <span>Existing pond / water</span></label>
+        <label class="check-item"><input type="checkbox" value="a brush or wood pile"> <span>Brush or wood pile</span></label>
+        <label class="check-item"><input type="checkbox" value="rock or stone features"> <span>Rocks / stone features</span></label>
+        <label class="check-item"><input type="checkbox" value="mostly open mowed lawn"> <span>Mostly open lawn</span></label>
+        <label class="check-item"><input type="checkbox" value="partial shade from trees or structures"> <span>Partial shade</span></label>
+        <label class="check-item"><input type="checkbox" value="a fence enclosing the yard"> <span>Fenced yard</span></label>
+      </div>
+    </div>
+    <div>
+      <label class="field-label">3 &nbsp;/&nbsp; Any of these apply? <span style="color:var(--dim)">(select all that apply)</span></label>
+      <div class="checks" id="threats">
+        <label class="check-item"><input type="checkbox" value="regular pesticide or herbicide use on the lawn"> <span>Pesticide / herbicide use</span></label>
+        <label class="check-item"><input type="checkbox" value="dogs that use the yard regularly"> <span>Dogs in the yard</span></label>
+        <label class="check-item"><input type="checkbox" value="cats that roam the yard or neighborhood"> <span>Cats nearby</span></label>
+        <label class="check-item"><input type="checkbox" value="bright outdoor lighting at night"> <span>Bright outdoor lighting</span></label>
+        <label class="check-item"><input type="checkbox" value="a koi pond or pond with fish"> <span>Koi / fish pond</span></label>
+        <label class="check-item"><input type="checkbox" value="heavy foot traffic through the yard"> <span>Heavy foot traffic</span></label>
+      </div>
+    </div>
+    <div>
+      <label class="field-label">4 &nbsp;/&nbsp; Anything else we should know? <span style="color:var(--dim)">(optional)</span></label>
+      <div class="field-hint">Examples: close to a creek or stream, neighbor has a pond, yard floods easily, near a park or nature reserve, HOA restrictions, heard frogs nearby before...</div>
+      <textarea id="extra" placeholder="Add any helpful context here..."></textarea>
+    </div>
+    <div>
+      <label class="field-label">Photo of your backyard <span style="color:var(--dim)">(optional — helps us give a more accurate analysis)</span></label>
+      <div class="upload-zone">
+        <input type="file" id="photo-input" accept="image/*">
+        <div class="upload-icon">📷</div>
+        <div class="upload-lbl">Tap to upload a photo</div>
+        <div class="upload-sub">JPEG or PNG</div>
+        <img id="preview-img" alt="yard preview">
+      </div>
+    </div>
+  </div>
+  <div class="submit-row">
+    <button class="btn-go" onclick="generateReport()">Generate My Report →</button>
+    <div class="submit-note">Powered by Claude AI<br>Free forever — no account needed</div>
+  </div>
+</div>
+</div>
+
+<div id="loading">
+  <div class="loading-card">
+    <div class="loading-lbl">⟳ &nbsp;Researching your yard...</div>
+    <div class="bar-track"><div class="bar-fill"></div></div>
+    <div class="loading-steps">
+      <div class="lstep active" id="ls1"><div class="ldot"></div>Looking up your location and regional amphibian species</div>
+      <div class="lstep" id="ls2"><div class="ldot"></div>Fetching nearby frog sightings from iNaturalist</div>
+      <div class="lstep" id="ls3"><div class="ldot"></div>Analyzing proximity to wetlands and water sources</div>
+      <div class="lstep" id="ls4"><div class="ldot"></div>Evaluating your yard's current habitat features</div>
+      <div class="lstep" id="ls5"><div class="ldot"></div>Building your personalized action plan</div>
+    </div>
+  </div>
+</div>
+
+<div id="report-section">
+  <div class="report-flag">Your Personalized Habitat Report</div>
+  <div class="report-h1">HABITAT ASSESSMENT</div>
+  <div class="report-addr" id="raddr"></div>
+  <div class="conn-strip" id="conn-strip">
+    <div class="conn-lbl">⬡ &nbsp;Landscape Connectivity Score</div>
+    <div class="conn-score-row">
+      <div class="conn-num" id="conn-num">—</div>
+      <div class="conn-sublabel" id="conn-sub"></div>
+    </div>
+    <div class="conn-body" id="conn-body"></div>
+  </div>
+  <div id="map-wrap">
+    <div class="map-lbl">⬡ &nbsp;Habitat Connectivity Map</div>
+    <div class="map-sublbl" id="inat-sublbl">Loading sightings from iNaturalist...</div>
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#6dd68a"></div>Your Yard</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5bc8c8"></div>Water / Wetland</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e8a84a"></div>Park / Green Space</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f5e642;border:1px solid #c8b800"></div>iNat Sighting</div>
+      <div class="inat-count" id="inat-count"></div>
+    </div>
+  </div>
+  <div id="err-container"></div>
+  <div class="rbody" id="report-body"></div>
+  <button class="btn-reset" onclick="resetForm()">← Start Over</button>
+</div>
+
+<footer>
+  <p>Frog Habitat Generator — Free Conservation Tool</p>
+  <p>Built by <a href="https://www.tiktok.com/@zekedarwinscience">@zekedarwinscience</a> &nbsp;·&nbsp; Powered by Claude AI &amp; iNaturalist</p>
+</footer>
+
+<script>
+const API_ENDPOINT = '/api/claude';
+
+document.getElementById('photo-input').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { const img = document.getElementById('preview-img'); img.src = e.target.result; img.style.display = 'block'; };
+  reader.readAsDataURL(file);
+});
+
+function animateSteps() {
+  const ids = ['ls1','ls2','ls3','ls4','ls5'];
+  let i = 0;
+  const iv = setInterval(() => {
+    if (i > 0) document.getElementById(ids[i-1]).className = 'lstep done';
+    if (i < ids.length) { document.getElementById(ids[i]).className = 'lstep active'; i++; }
+    else clearInterval(iv);
+  }, 2000);
+  return iv;
+}
+
+async function geocode(address) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`, { headers: {'Accept-Language':'en'} });
+    const d = await r.json();
+    return d[0] ? { lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) } : null;
+  } catch(e) { return null; }
+}
+
+async function getINatSightings(lat, lon) {
+  const taxonIds = '57492,24604,24615,24605';
+  const url = `https://api.inaturalist.org/v1/observations?taxon_id=${taxonIds}&lat=${lat}&lng=${lon}&radius=30&per_page=100&quality_grade=research&order_by=observed_on&order=desc`;
+  try { const r = await fetch(url); const d = await r.json(); return d.results || []; }
+  catch(e) { return []; }
+}
+
+async function getNearby(lat, lon) {
+  const q = `[out:json][timeout:20];(way["natural"="water"](around:4000,${lat},${lon});relation["natural"="water"](around:4000,${lat},${lon});way["waterway"~"river|stream|creek"](around:4000,${lat},${lon});way["leisure"="park"](around:4000,${lat},${lon});way["landuse"="wetland"](around:4000,${lat},${lon}););out center 15;`;
+  try { const r = await fetch('https://overpass-api.de/api/interpreter', {method:'POST',body:'data='+encodeURIComponent(q)}); const d = await r.json(); return d.elements || []; }
+  catch(e) { return []; }
+}
+
+function distM(lat1,lon1,lat2,lon2){const R=6371000,dL=(lat2-lat1)*Math.PI/180,dO=(lon2-lon1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dO/2)**2;return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));}
+
+function buildPrompt(address, features, threats, extra, nearby, inat, lat, lon) {
+  const nearbyDesc = nearby.length ? nearby.slice(0,8).map(f=>`- ${f.tags?.name||f.tags?.waterway||f.tags?.natural||f.tags?.leisure||'unnamed'} (${f.tags?.natural||f.tags?.waterway||f.tags?.leisure||f.tags?.landuse||'feature'})`).join('\n') : 'No major water features detected within 4km.';
+  const inatDesc = inat.length ? `${inat.length} confirmed amphibian sightings within 30km. Most recent: ${inat.slice(0,5).map(o=>{const name=o.taxon?.common_name||o.taxon?.name||'unknown';const date=o.observed_on||'unknown date';const d=o.location?distM(lat,lon,...o.location.split(',').map(Number)):'?';return `${name} (${date}, ${d}m away)`;}).join('; ')}` : 'No confirmed amphibian sightings found on iNaturalist within 30km.';
+
+  return `You are an expert in amphibian ecology, conservation biology, and backyard habitat design. Generate a detailed, personalized backyard habitat report for someone wanting to attract Cope's Gray Treefrogs (Dryophytes chrysoscelis) and support local amphibian populations.
+
+USER'S INFORMATION:
+- Address: ${address}
+- Coordinates: ${lat?lat.toFixed(4)+', '+lon.toFixed(4):'unavailable'}
+- Yard features: ${features.length?features.join(', '):'none specified'}
+- Threats/concerns: ${threats.length?threats.join(', '):'none specified'}
+- Additional context: ${extra||'none'}
+
+NEARBY HABITAT FEATURES (OpenStreetMap, within 4km):
+${nearbyDesc}
+
+INATURALIST AMPHIBIAN SIGHTING DATA (within 30km):
+${inatDesc}
+
+Generate a habitat report with these EXACT section headers:
+
+## REGIONAL SPECIES PROFILE
+Identify the specific region from the address. Lead with Cope's Gray Treefrog as the hero species — 3 sentences on why it's ideal for this region. Reference the iNaturalist data if relevant. Then list 2-3 bonus species they might also attract (one sentence each).
+
+## WHAT YOUR YARD ALREADY OFFERS
+3-4 specific things already working in their favor based on their yard features. Explain WHY each matters for gray treefrogs.
+
+## YOUR LIMITING FACTORS
+The 2-4 biggest barriers to amphibian colonization. Be honest and specific.
+
+## CONNECTIVITY SCORE
+Start with exactly: SCORE: X/10
+Then a short label (e.g. "Strong connectivity").
+Then 3-4 sentences: proximity to frog populations based on iNaturalist AND nearby habitat data, what the landscape corridor looks like, realistic timeline for frogs to reach the yard, main barriers or connectors. Reference specific sighting distances if available.
+
+## YOUR ACTION PLAN
+Exactly 5 numbered steps. Format each as:
+1. STEP TITLE IN CAPS
+One paragraph of specific actionable guidance tailored to their exact yard and threats. Step 1 should almost always be adding a small fishless pond if they don't have one.
+
+## STEPPING STONE SIGNIFICANCE
+3-4 sentences on the bigger conservation picture. Reference actual nearby sightings or habitat. Make it feel personal and meaningful.
+
+Keep the tone scientific but warm and accessible. Everything specific to this exact yard and location.`;
+}
+
+let mapInst = null;
+
+function buildMap(lat, lon, nearby, inat) {
+  document.getElementById('map-wrap').style.display = 'block';
+  if (mapInst) { mapInst.remove(); mapInst = null; }
+  mapInst = L.map('map', {zoomControl:true,scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap',maxZoom:18}).addTo(mapInst);
+  mapInst.setView([lat,lon],12);
+
+  const uIcon = L.divIcon({className:'',html:`<div style="width:16px;height:16px;border-radius:50%;background:#6dd68a;border:2px solid #191d1a;box-shadow:0 0 0 5px rgba(109,214,138,.2)"></div>`,iconSize:[16,16],iconAnchor:[8,8]});
+  L.marker([lat,lon],{icon:uIcon}).addTo(mapInst).bindPopup('<strong style="color:#6dd68a">Your Yard</strong><br>Proposed habitat site');
+
+  const seen = new Set();
+  for (const f of nearby.slice(0,14)) {
+    const clat=f.lat||f.center?.lat, clon=f.lon||f.center?.lon;
+    if (!clat||!clon) continue;
+    const key=`${clat.toFixed(3)},${clon.toFixed(3)}`;
+    if (seen.has(key)) continue; seen.add(key);
+    const t=f.tags?.natural||f.tags?.waterway||f.tags?.landuse||'';
+    const color=(t.includes('water')||t.includes('river')||t.includes('stream')||t.includes('creek'))?'#5bc8c8':'#e8a84a';
+    const name=f.tags?.name||f.tags?.waterway||f.tags?.natural||f.tags?.leisure||'Unnamed';
+    const type=f.tags?.natural||f.tags?.waterway||f.tags?.leisure||f.tags?.landuse||'feature';
+    const d=distM(lat,lon,clat,clon);
+    const icon=L.divIcon({className:'',html:`<div style="width:10px;height:10px;border-radius:50%;background:${color};border:2px solid #191d1a;box-shadow:0 0 0 2px ${color}55"></div>`,iconSize:[10,10],iconAnchor:[5,5]});
+    L.marker([clat,clon],{icon}).addTo(mapInst).bindPopup(`<strong>${name}</strong><br>${type} · ${d}m away`);
+  }
+
+  let inatCount = 0;
+  for (const obs of inat) {
+    if (!obs.location) continue;
+    const parts = obs.location.split(',');
+    if (parts.length < 2) continue;
+    const olat=parseFloat(parts[0]), olon=parseFloat(parts[1]);
+    if (isNaN(olat)||isNaN(olon)) continue;
+    const name=obs.taxon?.common_name||obs.taxon?.name||'Amphibian';
+    const date=obs.observed_on||'unknown date';
+    const d=distM(lat,lon,olat,olon);
+    const photoUrl=obs.taxon?.default_photo?.square_url||'';
+    const obsUrl=`https://www.inaturalist.org/observations/${obs.id}`;
+    const icon=L.divIcon({className:'',html:`<div style="width:9px;height:9px;border-radius:50%;background:#f5e642;border:1.5px solid #191d1a;box-shadow:0 0 0 2px rgba(245,230,66,.4)"></div>`,iconSize:[9,9],iconAnchor:[4.5,4.5]});
+    L.marker([olat,olon],{icon}).addTo(mapInst).bindPopup(`<strong style="color:#f5e642">${name}</strong><br>Observed: ${date}<br>${d}m from your yard<br><a href="${obsUrl}" target="_blank" style="color:#6dd68a;font-size:.8em">View on iNaturalist →</a>${photoUrl?`<br><img src="${photoUrl}" style="width:60px;height:60px;object-fit:cover;margin-top:.4rem;border:1px solid #2a342a">`:''}` );
+    inatCount++;
+  }
+
+  document.getElementById('inat-sublbl').textContent = inatCount > 0 ? `${inatCount} confirmed amphibian sightings within 30km — tap any yellow pin for details` : `No iNaturalist sightings found within 30km — your yard could help fill this gap`;
+  document.getElementById('inat-count').textContent = inatCount > 0 ? `${inatCount} iNaturalist sightings` : '';
+}
+
+function renderReport(text, address) {
+  document.getElementById('raddr').textContent = address.toUpperCase();
+  const sm = text.match(/SCORE:\s*(\d+)\/10/i);
+  if (sm) {
+    const s = parseInt(sm[1]);
+    document.getElementById('conn-num').textContent = s+'/10';
+    document.getElementById('conn-sub').textContent = s>=7?'Strong connectivity':s>=4?'Moderate connectivity':'Isolated — patience required';
+    const csec = text.match(/## CONNECTIVITY SCORE([\s\S]*?)(?=## )/i);
+    if (csec) { const ct=csec[1].replace(/SCORE:\s*\d+\/10/i,'').replace(/^.*(Strong|Moderate|Isolated|Good|Low|High|Fair).*\n/im,'').trim(); document.getElementById('conn-body').textContent=ct; }
+    document.getElementById('conn-strip').style.display='block';
+  }
+  let html='';
+  const secs=text.split(/^## /m).filter(s=>s.trim());
+  for (const sec of secs) {
+    const lines=sec.trim().split('\n'), title=lines[0].trim().toUpperCase(), content=lines.slice(1).join('\n').trim();
+    if (title.includes('CONNECTIVITY SCORE')) continue;
+    html+=`<h2>${title}</h2>`;
+    if (title.includes('ACTION PLAN')) {
+      const steps=[], rx=/(\d+)\.\s+([A-Z][A-Z\s\/&'',-]{2,})\n([\s\S]*?)(?=\n\d+\.|$)/g; let m;
+      while((m=rx.exec(content))!==null) steps.push({num:m[1],title:m[2].trim(),body:m[3].trim()});
+      if (steps.length>0) { html+='<div class="step-cards">'; for(const st of steps) html+=`<div class="scard"><div class="snum">${st.num}</div><div class="scontent"><h4>${st.title}</h4><p>${fi(st.body)}</p></div></div>`; html+='</div>'; }
+      else html+=fb(content);
+    } else if (title.includes('REGIONAL SPECIES')) {
+      html+=`<div class="species-chips"><span class="chip hero">🐸 Cope's Gray Treefrog</span><span class="chip">Woodhouse's Toad</span><span class="chip">Cricket Frog</span><span class="chip">Narrow-mouthed Toad</span></div>`;
+      html+=fb(content);
+    } else { html+=fb(content); }
+  }
+  document.getElementById('report-body').innerHTML=html;
+}
+
+function fb(text){let html='',inUl=false;for(const line of text.split('\n')){const l=line.trim();if(!l){if(inUl){html+='</ul>';inUl=false;}continue;}if(l.match(/^[-•*]\s+/)){if(!inUl){html+='<ul>';inUl=true;}html+=`<li>${fi(l.replace(/^[-•*]\s+/,''))}</li>`;}else if(l.match(/^###\s/)){if(inUl){html+='</ul>';inUl=false;}html+=`<h3>${l.replace(/^###\s/,'')}</h3>`;}else{if(inUl){html+='</ul>';inUl=false;}html+=`<p>${fi(l)}</p>`;}}if(inUl)html+='</ul>';return html;}
+function fi(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>');}
+
+async function generateReport() {
+  const address=document.getElementById('address').value.trim();
+  if(!address){alert('Please enter your address.');return;}
+  const features=[...document.querySelectorAll('#features input:checked')].map(i=>i.value);
+  const threats=[...document.querySelectorAll('#threats input:checked')].map(i=>i.value);
+  const extra=document.getElementById('extra').value.trim();
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('loading').style.display='block';
+  document.getElementById('report-section').style.display='none';
+  document.getElementById('err-container').innerHTML='';
+  const stepTimer=animateSteps();
+  let lat=null,lon=null,nearby=[],inat=[];
+  try {
+    const geo=await geocode(address);
+    if(geo){lat=geo.lat;lon=geo.lon;[inat,nearby]=await Promise.all([getINatSightings(lat,lon),getNearby(lat,lon)]);}
+    const prompt=buildPrompt(address,features,threats,extra,nearby,inat,lat,lon);
+    let messages;
+    const photoFile=document.getElementById('photo-input').files[0];
+    if(photoFile){
+      const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(photoFile);});
+      messages=[{role:'user',content:[{type:'image',source:{type:'base64',media_type:photoFile.type||'image/jpeg',data:b64}},{type:'text',text:prompt+'\n\nThe user uploaded a photo of their backyard. Analyze it visually and incorporate observations about canopy cover, open space, shade, shelter opportunities, and overall habitat quality.'}]}];
+    } else { messages=[{role:'user',content:prompt}]; }
+
+    const res=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages})});
+    clearInterval(stepTimer);
+    ['ls1','ls2','ls3','ls4','ls5'].forEach(id=>document.getElementById(id).className='lstep done');
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`Server error ${res.status}`);}
+    const data=await res.json();
+    const reportText=data.content?.find(b=>b.type==='text')?.text||'';
+    if(!reportText) throw new Error('No report content returned.');
+    document.getElementById('loading').style.display='none';
+    document.getElementById('report-section').style.display='block';
+    renderReport(reportText,address);
+    if(lat&&lon){setTimeout(()=>{buildMap(lat,lon,nearby,inat);if(mapInst)mapInst.invalidateSize();},200);}
+    document.getElementById('report-section').scrollIntoView({behavior:'smooth'});
+  } catch(err) {
+    clearInterval(stepTimer);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('report-section').style.display='block';
+    document.getElementById('err-container').innerHTML=`<div class="err-card"><div class="err-lbl">Error</div><div class="err-body">${err.message}</div></div>`;
+    document.getElementById('report-section').scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function resetForm(){
+  document.getElementById('form-section').style.display='block';
+  document.getElementById('report-section').style.display='none';
+  document.getElementById('loading').style.display='none';
+  document.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);
+  document.getElementById('address').value='';
+  document.getElementById('extra').value='';
+  document.getElementById('photo-input').value='';
+  document.getElementById('preview-img').style.display='none';
+  ['ls1','ls2','ls3','ls4','ls5'].forEach(id=>document.getElementById(id).className='lstep');
+  document.getElementById('ls1').className='lstep active';
+  if(mapInst){mapInst.remove();mapInst=null;}
+  document.getElementById('map-wrap').style.display='none';
+  document.getElementById('conn-strip').style.display='none';
+  document.getElementById('report-body').innerHTML='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+
+</body>
+</html>
