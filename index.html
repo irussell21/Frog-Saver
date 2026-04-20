@@ -350,7 +350,7 @@ function buildMap(lat, lon, nearby, inat) {
   document.getElementById('map-wrap').style.display = 'block';
   if (mapInst) { mapInst.remove(); mapInst = null; }
   mapInst = L.map('map', {zoomControl:true,scrollWheelZoom:false});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap',maxZoom:18}).addTo(mapInst);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution:'© Esri',maxZoom:18}).addTo(mapInst);
   mapInst.setView([lat,lon],12);
 
   const uIcon = L.divIcon({className:'',html:`<div style="width:16px;height:16px;border-radius:50%;background:#6dd68a;border:2px solid #191d1a;box-shadow:0 0 0 5px rgba(109,214,138,.2)"></div>`,iconSize:[16,16],iconAnchor:[8,8]});
