@@ -448,7 +448,7 @@ async function generateReport() {
       messages=[{role:'user',content:[{type:'image',source:{type:'base64',media_type:photoFile.type||'image/jpeg',data:b64}},{type:'text',text:prompt+'\n\nThe user uploaded a photo of their backyard. Analyze it visually and incorporate observations about canopy cover, open space, shade, shelter opportunities, and overall habitat quality.'}]}];
     } else { messages=[{role:'user',content:prompt}]; }
 
-    const res=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages})});
+    const res=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:2000,messages})});
     clearInterval(stepTimer);
     ['ls1','ls2','ls3','ls4','ls5'].forEach(id=>document.getElementById(id).className='lstep done');
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`Server error ${res.status}`);}
