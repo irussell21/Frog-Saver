@@ -284,7 +284,7 @@ async function geocode(address) {
 }
 
 async function getINatSightings(lat, lon) {
-  const taxonIds = '57492,24604,24615,24605';
+  const taxonIds = '23930,24604,64968,24605';
   const url = `https://api.inaturalist.org/v1/observations?taxon_id=${taxonIds}&lat=${lat}&lng=${lon}&radius=30&per_page=100&quality_grade=research&order_by=observed_on&order=desc`;
   try { const r = await fetch(url); const d = await r.json(); return d.results || []; }
   catch(e) { return []; }
